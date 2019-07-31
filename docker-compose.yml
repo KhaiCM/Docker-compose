@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+    application:
+        container_name: lrv_application
+        image: debian
+        volumes:
+            - ./:/var/www/laravel
+    php-fpm:
+        container_name: lrv_php_fpm
+        restart: always
+        image: tinkling/php-fpm-docker
+        volumes:
+            - ./:/var/www/laravel
+        expose:
+            - "9000"
+    nginx:
+        container_name: lrv_nginx
+        restart: always
+        image: tinkling/nginx-image-docker
+        volumes:
+            - ./:/var/www/laravel
+        port: 
+            - "8000:80"
+        links: 
+            - php-fpm
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+            - ./nginx_conf:/etc/nginx/conf.d
+    mysql:
+        container_name: lrv_mysql
+        restart: always
+        image: mysql:5.7
+        expose:
+            - "3306"
+        volumes:
+            - db:/var/lib/mysql
+        environment:
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: root
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: sun1234
